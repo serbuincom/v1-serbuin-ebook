@@ -4,14 +4,11 @@ let genAI: any = null;
 
 function getGenAI() {
   if (!genAI) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || apiKey === "") {
-      throw new Error("API Key Gemini tidak ditemukan. Pastikan sudah diatur di Environment Variables Vercel.");
+      throw new Error("API Key Gemini tidak ditemukan. Pastikan sudah diatur di Environment Variables Vercel (VITE_GEMINI_API_KEY).");
     }
-    // Explicitly set apiVersion to 'v1' to avoid v1beta issues if possible
     genAI = new GoogleGenerativeAI(apiKey);
-    // Note: The current SDK version might not support passing apiVersion in the constructor options directly 
-    // in the way I intended, but let's ensure the model name is correct first.
   }
   return genAI;
 }
@@ -36,7 +33,7 @@ export const generateStep1Problems = async (niche: string, expertise: string) =>
         }
       }
     }
-  });
+  }, { apiVersion: 'v1' });
 
   const result = await model.generateContent(`Saya ingin membuat ebook di niche "${niche}" dengan keahlian "${expertise}". 
     Identifikasi 5 masalah yang paling sering dirasakan orang banyak di niche ini yang memiliki potensi cuan tinggi jika solusinya disediakan dalam bentuk ebook.
@@ -63,7 +60,7 @@ export const generateStep2TargetMarket = async (problem: string) => {
         required: ["demographics", "psychographics", "pain_points", "buying_power"]
       }
     }
-  });
+  }, { apiVersion: 'v1' });
 
   const response = await model.generateContent(`Berdasarkan masalah ini: "${problem}", tentukan target market yang paling spesifik dan ideal.
     Berikan output dalam format JSON object dengan properti: "demographics", "psychographics", "pain_points", "buying_power".`);
@@ -87,7 +84,7 @@ export const generateStep3Solution = async (problem: string, targetMarket: strin
         required: ["core_solution", "key_benefits", "unique_selling_point"]
       }
     }
-  });
+  }, { apiVersion: 'v1' });
 
   const response = await model.generateContent(`Masalah: "${problem}". Target Market: "${targetMarket}". 
     Rumuskan solusi yang komprehensif yang akan dibahas dalam ebook.
@@ -115,7 +112,7 @@ export const generateStep4Outline = async (problem: string, targetMarket: string
         required: ["title", "description", "outline"]
       }
     }
-  });
+  }, { apiVersion: 'v1' });
 
   const response = await model.generateContent(`Berdasarkan Masalah: "${problem}", Target Market: "${targetMarket}", dan Solusi: "${solution}".
     Buatlah Nama Ebook yang menarik (catchy), Deskripsi singkat, dan Outline (Daftar Isi) yang terdiri dari minimal 5 bab.
@@ -132,7 +129,7 @@ export const generateChapterContent = async (
   notes: string
 ) => {
   const client = getGenAI();
-  const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = client.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
 
   const prompt = `Anda adalah seorang penulis ebook profesional yang ahli dalam menulis konten yang praktis, mudah dipahami, dan "to the point".
           
