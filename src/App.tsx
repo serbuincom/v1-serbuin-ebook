@@ -191,13 +191,21 @@ function AppContent() {
 
   // Step 1: Generate Problems
   const handleGenerateProblems = async () => {
-    if (!data.niche || !data.expertise) return;
+    if (!data.niche || !data.expertise) {
+      alert("Silakan isi niche dan keahlian Anda terlebih dahulu.");
+      return;
+    }
     setIsLoading(true);
     try {
       const result = await generateStep1Problems(data.niche, data.expertise);
+      if (!result || !Array.isArray(result) || result.length === 0) {
+        throw new Error("AI tidak memberikan hasil masalah. Silakan coba lagi.");
+      }
       setProblems(result);
+      setCurrentStep(1); // Move to step 1 explicitly
     } catch (error) {
-      console.error(error);
+      console.error("Error generating problems:", error);
+      alert(error instanceof Error ? error.message : "Terjadi kesalahan saat mencari masalah. Silakan cek koneksi atau API Key Anda.");
     } finally {
       setIsLoading(false);
     }
@@ -512,13 +520,14 @@ ${data.outline.map((o, i) => `${i+1}. ${o}`).join('\n')}
                 <CardFooter className="bg-slate-50 border-t p-6">
                   <Button 
                     className="w-full py-6 text-lg font-bold bg-brand hover:bg-brand/90" 
-                    disabled={!data.niche || !data.expertise}
-                    onClick={() => {
-                      handleGenerateProblems();
-                      nextStep();
-                    }}
+                    disabled={!data.niche || !data.expertise || isLoading}
+                    onClick={handleGenerateProblems}
                   >
-                    Mulai Cari Masalah <ArrowRight className="ml-2 h-5 w-5" />
+                    {isLoading ? (
+                      <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Sedang Mencari...</>
+                    ) : (
+                      <>Mulai Cari Masalah <ArrowRight className="ml-2 h-5 w-5" /></>
+                    )}
                   </Button>
                 </CardFooter>
               </Card>
