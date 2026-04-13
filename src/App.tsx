@@ -106,7 +106,66 @@ const WRITING_STYLES = [
   { value: 'bercerita', label: 'Storytelling (Bercerita)' },
 ];
 
+// Error Boundary Component
+class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
+  constructor(props: {children: React.ReactNode}) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("Uncaught error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+          <Card className="max-w-md w-full border-red-200 shadow-xl">
+            <CardHeader className="bg-red-50 border-b border-red-100">
+              <CardTitle className="text-red-700 flex items-center gap-2">
+                <X className="h-5 w-5" />
+                Terjadi Kesalahan
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <p className="text-slate-600 mb-4">
+                Aplikasi mengalami kendala saat memuat. Ini biasanya disebabkan oleh konfigurasi API Key yang belum lengkap.
+              </p>
+              <div className="bg-slate-100 p-3 rounded text-xs font-mono text-slate-800 overflow-auto max-h-32">
+                {this.state.error?.message}
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                className="w-full bg-red-600 hover:bg-red-700 text-white"
+                onClick={() => window.location.reload()}
+              >
+                Muat Ulang Halaman
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 export default function App() {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
+  );
+}
+
+function AppContent() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<EbookData>({
