@@ -207,8 +207,15 @@ function AppContent() {
       console.error("Error generating problems:", error);
       let message = "Terjadi kesalahan saat mencari masalah. Silakan cek koneksi atau API Key Anda.";
       if (error instanceof Error) {
+        console.log("Error details:", {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
         if (error.message.includes("404")) {
           message = "Error 404: Model AI tidak ditemukan. Pastikan API Gemini sudah aktif di Google AI Studio (aistudio.google.com) untuk API Key Anda.";
+        } else if (error.message.includes("fetch")) {
+          message = "Gagal menghubungi server Google (Fetch Error). Cek koneksi internet Anda atau pastikan API Key valid.";
         } else {
           message = error.message;
         }
