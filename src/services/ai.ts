@@ -16,7 +16,7 @@ function getGenAI() {
 export const generateStep1Problems = async (niche: string, expertise: string) => {
   const client = getGenAI();
   const model = client.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
+    model: "gemini-1.5-flash-latest",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -46,7 +46,7 @@ export const generateStep1Problems = async (niche: string, expertise: string) =>
 export const generateStep2TargetMarket = async (problem: string) => {
   const client = getGenAI();
   const model = client.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
+    model: "gemini-1.5-flash-latest",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -71,7 +71,7 @@ export const generateStep2TargetMarket = async (problem: string) => {
 export const generateStep3Solution = async (problem: string, targetMarket: string) => {
   const client = getGenAI();
   const model = client.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
+    model: "gemini-1.5-flash-latest",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -96,7 +96,7 @@ export const generateStep3Solution = async (problem: string, targetMarket: strin
 export const generateStep4Outline = async (problem: string, targetMarket: string, solution: string) => {
   const client = getGenAI();
   const model = client.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
+    model: "gemini-1.5-flash-latest",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -129,7 +129,7 @@ export const generateChapterContent = async (
   notes: string
 ) => {
   const client = getGenAI();
-  const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = client.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
   const prompt = `Anda adalah seorang penulis ebook profesional yang ahli dalam menulis konten yang praktis, mudah dipahami, dan "to the point".
           
