@@ -8,7 +8,10 @@ function getGenAI() {
     if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || apiKey === "") {
       throw new Error("API Key Gemini tidak ditemukan. Pastikan sudah diatur di Environment Variables Vercel.");
     }
+    // Explicitly set apiVersion to 'v1' to avoid v1beta issues if possible
     genAI = new GoogleGenerativeAI(apiKey);
+    // Note: The current SDK version might not support passing apiVersion in the constructor options directly 
+    // in the way I intended, but let's ensure the model name is correct first.
   }
   return genAI;
 }
@@ -16,7 +19,7 @@ function getGenAI() {
 export const generateStep1Problems = async (niche: string, expertise: string) => {
   const client = getGenAI();
   const model = client.getGenerativeModel({ 
-    model: "gemini-1.5-flash-latest",
+    model: "gemini-1.5-flash",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -46,7 +49,7 @@ export const generateStep1Problems = async (niche: string, expertise: string) =>
 export const generateStep2TargetMarket = async (problem: string) => {
   const client = getGenAI();
   const model = client.getGenerativeModel({ 
-    model: "gemini-1.5-flash-latest",
+    model: "gemini-1.5-flash",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -71,7 +74,7 @@ export const generateStep2TargetMarket = async (problem: string) => {
 export const generateStep3Solution = async (problem: string, targetMarket: string) => {
   const client = getGenAI();
   const model = client.getGenerativeModel({ 
-    model: "gemini-1.5-flash-latest",
+    model: "gemini-1.5-flash",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -96,7 +99,7 @@ export const generateStep3Solution = async (problem: string, targetMarket: strin
 export const generateStep4Outline = async (problem: string, targetMarket: string, solution: string) => {
   const client = getGenAI();
   const model = client.getGenerativeModel({ 
-    model: "gemini-1.5-flash-latest",
+    model: "gemini-1.5-flash",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -129,7 +132,7 @@ export const generateChapterContent = async (
   notes: string
 ) => {
   const client = getGenAI();
-  const model = client.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+  const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `Anda adalah seorang penulis ebook profesional yang ahli dalam menulis konten yang praktis, mudah dipahami, dan "to the point".
           

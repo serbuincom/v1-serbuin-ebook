@@ -205,7 +205,15 @@ function AppContent() {
       setCurrentStep(1); // Move to step 1 explicitly
     } catch (error) {
       console.error("Error generating problems:", error);
-      alert(error instanceof Error ? error.message : "Terjadi kesalahan saat mencari masalah. Silakan cek koneksi atau API Key Anda.");
+      let message = "Terjadi kesalahan saat mencari masalah. Silakan cek koneksi atau API Key Anda.";
+      if (error instanceof Error) {
+        if (error.message.includes("404")) {
+          message = "Error 404: Model AI tidak ditemukan. Pastikan API Gemini sudah aktif di Google AI Studio (aistudio.google.com) untuk API Key Anda.";
+        } else {
+          message = error.message;
+        }
+      }
+      alert(message);
     } finally {
       setIsLoading(false);
     }
