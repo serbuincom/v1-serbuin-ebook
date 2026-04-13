@@ -189,6 +189,24 @@ function AppContent() {
   const [isAutoWriting, setIsAutoWriting] = useState(false);
   const [writingProgress, setWritingProgress] = useState({ current: 0, total: 0 });
 
+  const handleAppError = (error: any, defaultMsg: string) => {
+    console.error(error);
+    let message = defaultMsg;
+    const errorMsg = error.message || "";
+    
+    if (errorMsg.includes("404")) {
+      message = "Error 404: Model AI tidak ditemukan. Ini biasanya berarti API Key Anda belum diaktifkan untuk model ini di Google AI Studio (aistudio.google.com).";
+    } else if (errorMsg.includes("403")) {
+      message = "Error 403: Akses ditolak. Pastikan API Key Anda valid dan memiliki izin yang cukup.";
+    } else if (errorMsg.includes("fetch")) {
+      message = "Gagal menghubungi server Google (Fetch Error). Cek koneksi internet Anda atau pastikan API Key valid.";
+    } else if (errorMsg) {
+      message = errorMsg;
+    }
+    
+    alert(message);
+  };
+
   // Step 1: Generate Problems
   const handleGenerateProblems = async () => {
     if (!data.niche || !data.expertise) {
@@ -204,23 +222,7 @@ function AppContent() {
       setProblems(result);
       setCurrentStep(1); // Move to step 1 explicitly
     } catch (error) {
-      console.error("Error generating problems:", error);
-      let message = "Terjadi kesalahan saat mencari masalah. Silakan cek koneksi atau API Key Anda.";
-      if (error instanceof Error) {
-        console.log("Error details:", {
-          message: error.message,
-          stack: error.stack,
-          name: error.name
-        });
-        if (error.message.includes("404")) {
-          message = "Error 404: Model AI tidak ditemukan. Pastikan API Gemini sudah aktif di Google AI Studio (aistudio.google.com) untuk API Key Anda.";
-        } else if (error.message.includes("fetch")) {
-          message = "Gagal menghubungi server Google (Fetch Error). Cek koneksi internet Anda atau pastikan API Key valid.";
-        } else {
-          message = error.message;
-        }
-      }
-      alert(message);
+      handleAppError(error, "Terjadi kesalahan saat mencari masalah. Silakan cek koneksi atau API Key Anda.");
     } finally {
       setIsLoading(false);
     }
@@ -235,7 +237,7 @@ function AppContent() {
       setData(prev => ({ ...prev, targetMarket: result }));
       setCurrentStep(2);
     } catch (error) {
-      console.error(error);
+      handleAppError(error, "Terjadi kesalahan saat memetakan target market.");
     } finally {
       setIsLoading(false);
     }
@@ -253,7 +255,7 @@ function AppContent() {
       setData(prev => ({ ...prev, solution: result }));
       setCurrentStep(3);
     } catch (error) {
-      console.error(error);
+      handleAppError(error, "Terjadi kesalahan saat merumuskan solusi.");
     } finally {
       setIsLoading(false);
     }
@@ -277,7 +279,7 @@ function AppContent() {
       }));
       setCurrentStep(4);
     } catch (error) {
-      console.error(error);
+      handleAppError(error, "Terjadi kesalahan saat menyusun outline.");
     } finally {
       setIsLoading(false);
     }
@@ -299,7 +301,7 @@ function AppContent() {
       }));
       setActiveChapter(chapterTitle);
     } catch (error) {
-      console.error(error);
+      handleAppError(error, "Terjadi kesalahan saat menulis bab.");
     } finally {
       setIsLoading(false);
     }
@@ -330,12 +332,12 @@ function AppContent() {
         setWritingProgress(prev => ({ ...prev, current: i + 1 }));
       }
     } catch (error) {
-      console.error(error);
-      alert("Terjadi kesalahan saat menulis otomatis. Silakan coba lagi.");
+      handleAppError(error, "Terjadi kesalahan saat menulis otomatis.");
     } finally {
       setIsAutoWriting(false);
     }
   };
+
 
   const downloadWord = async () => {
     const chaptersHtml = await Promise.all(data.outline.map(async (chapter, idx) => {
